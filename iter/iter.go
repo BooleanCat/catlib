@@ -71,3 +71,21 @@ func (iter *DropIter[T]) Next() catlib.Option[T] {
 
 	return iter.iter.Next()
 }
+
+type MapIter[T, S any] struct {
+	iter Iterator[T]
+	f    func(T) S
+}
+
+func Map[T, S any](iter Iterator[T], f func(T) S) *MapIter[T, S] {
+	return &MapIter[T, S]{iter, f}
+}
+
+func (iter *MapIter[T, S]) Next() catlib.Option[S] {
+	next := iter.iter.Next()
+	if !next.Present {
+		return catlib.None[S]()
+	}
+
+	return catlib.Some(iter.f(next.Unwrap()))
+}

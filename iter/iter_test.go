@@ -1,6 +1,7 @@
 package iter_test
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/BooleanCat/catlib/internal/assert"
@@ -40,4 +41,10 @@ func TestDrop(t *testing.T) {
 func TestDropZero(t *testing.T) {
 	skipped := iter.Drop[int](iter.Count(), 0)
 	assert.Equal(t, skipped.Next().Unwrap(), 0)
+}
+
+func TestMap(t *testing.T) {
+	mapped := iter.Map[int](iter.Count(), strconv.Itoa)
+	assert.Equal(t, mapped.Next().Unwrap(), "0")
+	assert.Equal(t, mapped.Next().Unwrap(), "1")
 }
