@@ -89,3 +89,14 @@ func (iter *MapIter[T, S]) Next() catlib.Option[S] {
 
 	return catlib.Some(iter.f(next.Unwrap()))
 }
+
+func Fold[S, T any](iter Iterator[S], initial T, f func(S, T) T) T {
+	for {
+		next := iter.Next()
+		if !next.Present {
+			return initial
+		}
+
+		initial = f(next.Unwrap(), initial)
+	}
+}

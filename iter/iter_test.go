@@ -48,3 +48,9 @@ func TestMap(t *testing.T) {
 	assert.Equal(t, mapped.Next().Unwrap(), "0")
 	assert.Equal(t, mapped.Next().Unwrap(), "1")
 }
+
+func TestFold(t *testing.T) {
+	add := func(a, b int) int { return a + b }
+	sum := iter.Fold[int](iter.Take[int](iter.Count(), 11), 0, add)
+	assert.Equal(t, sum, 55)
+}
