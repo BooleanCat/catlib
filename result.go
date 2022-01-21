@@ -26,9 +26,9 @@ func (t Result[T]) String() string {
 var _ fmt.Stringer = Result[struct{}]{}
 
 func (t Result[T]) Unwrap() T {
-	if t.err != nil {
-		panic(fmt.Sprintf(`unwrap "%s"`, t))
+	if t.err == nil {
+		return t.t
 	}
 
-	return t.t
+	panic(fmt.Sprintf(`unwrap "%s"`, t))
 }

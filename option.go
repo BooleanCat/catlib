@@ -4,19 +4,19 @@ import "fmt"
 
 type Option[T any] struct {
 	t       T
-	present bool
+	Present bool
 }
 
 func Some[T any](t T) Option[T] {
-	return Option[T]{t: t, present: true}
+	return Option[T]{t: t, Present: true}
 }
 
 func None[T any]() Option[T] {
-	return Option[T]{present: false}
+	return Option[T]{Present: false}
 }
 
 func (t Option[T]) String() string {
-	if !t.present {
+	if !t.Present {
 		return "None"
 	}
 
@@ -26,9 +26,9 @@ func (t Option[T]) String() string {
 var _ fmt.Stringer = Option[struct{}]{}
 
 func (t Option[T]) Unwrap() T {
-	if !t.present {
-		panic(fmt.Sprintf(`unwrap "%s"`, t))
+	if t.Present {
+		return t.t
 	}
 
-	return t.t
+	panic(fmt.Sprintf(`unwrap "%s"`, t))
 }
