@@ -57,3 +57,7 @@ func (t Result[T]) UnwrapOrZero() T {
 	var s T
 	return s
 }
+
+func (t Result[T]) Value() (T, error) {
+	return t.t, t.err
+}

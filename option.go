@@ -57,3 +57,7 @@ func (t Option[T]) UnwrapOrZero() T {
 	var s T
 	return s
 }
+
+func (t Option[T]) Value() (T, bool) {
+	return t.t, t.Present
+}

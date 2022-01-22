@@ -56,3 +56,15 @@ func TestOkUnwrapOrZero(t *testing.T) {
 func TestErrUnwrapOrZero(t *testing.T) {
 	assert.Equal(t, catlib.Err[int](errors.New("foo")).UnwrapOrZero(), 0)
 }
+
+func TestOkValue(t *testing.T) {
+	value, err := catlib.Ok(42).Value()
+	assert.Equal(t, value, 42)
+	assert.Nil(t, err)
+}
+
+func TestErrValue(t *testing.T) {
+	_, err := catlib.Err[int](errors.New("foo")).Value()
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "foo")
+}

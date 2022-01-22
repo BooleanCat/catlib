@@ -55,3 +55,14 @@ func TestUnwrapOrZeroSome(t *testing.T) {
 func TestUnwrapOrZeroNone(t *testing.T) {
 	assert.Equal(t, catlib.None[int]().UnwrapOrZero(), 0)
 }
+
+func TestSomeValue(t *testing.T) {
+	value, present := catlib.Some(42).Value()
+	assert.Equal(t, value, 42)
+	assert.True(t, present)
+}
+
+func TestNoneValue(t *testing.T) {
+	_, present := catlib.None[int]().Value()
+	assert.False(t, present)
+}

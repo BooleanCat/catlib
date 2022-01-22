@@ -35,7 +35,7 @@ func Take[T any](iter Iterator[T], cap int) *TakeIter[T] {
 func (iter *TakeIter[T]) Next() catlib.Option[T] {
 	next := iter.iter.Next()
 	if !next.Present {
-		return catlib.None[T]()
+		return next
 	}
 
 	iter.taken += 1
@@ -69,7 +69,7 @@ func (iter *DropIter[T]) Next() catlib.Option[T] {
 	for i := 0; i < iter.cap; i++ {
 		next := iter.iter.Next()
 		if !next.Present {
-			return catlib.None[T]()
+			return next
 		}
 	}
 
@@ -88,23 +88,21 @@ func Map[T, S any](iter Iterator[T], f func(T) S) *MapIter[T, S] {
 }
 
 func (iter *MapIter[T, S]) Next() catlib.Option[S] {
-	next := iter.iter.Next()
-	if !next.Present {
+	if v, ok := iter.iter.Next().Value(); !ok {
 		return catlib.None[S]()
+	} else {
+		return catlib.Some(iter.f(v))
 	}
-
-	return catlib.Some(iter.f(next.Unwrap()))
 }
 
 var _ Iterator[struct{}] = new(MapIter[struct{}, struct{}])
 
 func Fold[S, T any](iter Iterator[S], initial T, f func(S, T) T) T {
 	for {
-		next := iter.Next()
-		if !next.Present {
+		if v, ok := iter.Next().Value(); !ok {
 			return initial
+		} else {
+			initial = f(v, initial)
 		}
-
-		initial = f(next.Unwrap(), initial)
 	}
 }
