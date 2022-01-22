@@ -32,3 +32,28 @@ func (t Option[T]) Unwrap() T {
 
 	panic(fmt.Sprintf(`unwrap "%s"`, t))
 }
+
+func (t Option[T]) UnwrapOr(s T) T {
+	if t.Present {
+		return t.t
+	}
+
+	return s
+}
+
+func (t Option[T]) UnwrapOrElse(f func() T) T {
+	if t.Present {
+		return t.t
+	}
+
+	return f()
+}
+
+func (t Option[T]) UnwrapOrZero() T {
+	if t.Present {
+		return t.t
+	}
+
+	var s T
+	return s
+}

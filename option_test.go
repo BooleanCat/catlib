@@ -23,14 +23,39 @@ func TestNonePrint(t *testing.T) {
 }
 
 func TestSomeUnwrap(t *testing.T) {
-	o := catlib.Some("foo")
-	assert.Equal(t, o.Unwrap(), "foo")
+	assert.Equal(t, catlib.Some("foo").Unwrap(), "foo")
 }
 
 func TestNoneUnwrap(t *testing.T) {
-	o := catlib.None[string]()
 	defer func() { recover() }()
-	o.Unwrap()
-
+	catlib.None[struct{}]().Unwrap()
 	t.Error("did not panic")
+}
+
+func TestUnwrapOrSome(t *testing.T) {
+	assert.Equal(t, catlib.Some(21).UnwrapOr(42), 21)
+}
+
+func TestUnwrapOrNone(t *testing.T) {
+	assert.Equal(t, catlib.None[int]().UnwrapOr(42), 42)
+}
+
+func TestUnwrapOrElseSome(t *testing.T) {
+	assert.Equal(t, catlib.Some(21).UnwrapOrElse(func() int {
+		return 42
+	}), 21)
+}
+
+func TestUnwrapOrElseNone(t *testing.T) {
+	assert.Equal(t, catlib.None[int]().UnwrapOrElse(func() int {
+		return 42
+	}), 42)
+}
+
+func TestUnwrapOrZeroSome(t *testing.T) {
+	assert.Equal(t, catlib.Some(21).UnwrapOrZero(), 21)
+}
+
+func TestUnwrapOrZeroNone(t *testing.T) {
+	assert.Equal(t, catlib.None[int]().UnwrapOrZero(), 0)
 }

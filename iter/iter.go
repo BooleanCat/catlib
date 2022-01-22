@@ -20,6 +20,8 @@ func Count() *CountIter {
 	return &CountIter{}
 }
 
+var _ Iterator[int] = new(CountIter)
+
 type TakeIter[T any] struct {
 	iter  Iterator[T]
 	cap   int
@@ -44,6 +46,8 @@ func (iter *TakeIter[T]) Next() catlib.Option[T] {
 
 	return catlib.None[T]()
 }
+
+var _ Iterator[struct{}] = new(TakeIter[struct{}])
 
 type DropIter[T any] struct {
 	iter    Iterator[T]
@@ -72,6 +76,8 @@ func (iter *DropIter[T]) Next() catlib.Option[T] {
 	return iter.iter.Next()
 }
 
+var _ Iterator[struct{}] = new(DropIter[struct{}])
+
 type MapIter[T, S any] struct {
 	iter Iterator[T]
 	f    func(T) S
@@ -89,6 +95,8 @@ func (iter *MapIter[T, S]) Next() catlib.Option[S] {
 
 	return catlib.Some(iter.f(next.Unwrap()))
 }
+
+var _ Iterator[struct{}] = new(MapIter[struct{}, struct{}])
 
 func Fold[S, T any](iter Iterator[S], initial T, f func(S, T) T) T {
 	for {
