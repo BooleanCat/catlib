@@ -32,3 +32,28 @@ func (t Result[T]) Unwrap() T {
 
 	panic(fmt.Sprintf(`unwrap "%s"`, t))
 }
+
+func (t Result[T]) UnwrapOr(s T) T {
+	if t.err == nil {
+		return t.t
+	}
+
+	return s
+}
+
+func (t Result[T]) UnwrapOrElse(f func() T) T {
+	if t.err == nil {
+		return t.t
+	}
+
+	return f()
+}
+
+func (t Result[T]) UnwrapOrZero() T {
+	if t.err == nil {
+		return t.t
+	}
+
+	var s T
+	return s
+}

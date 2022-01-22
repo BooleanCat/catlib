@@ -9,17 +9,13 @@ import (
 )
 
 func TestSomePrint(t *testing.T) {
-	o := catlib.Some("foo")
-	p := catlib.Some(42)
-	assert.Equal(t, fmt.Sprint(o), "Some(foo)")
-	assert.Equal(t, fmt.Sprint(p), "Some(42)")
+	assert.Equal(t, fmt.Sprint(catlib.Some("foo")), "Some(foo)")
+	assert.Equal(t, fmt.Sprint(catlib.Some(42)), "Some(42)")
 }
 
 func TestNonePrint(t *testing.T) {
-	o := catlib.None[string]()
-	p := catlib.None[int]()
-	assert.Equal(t, fmt.Sprint(o), "None")
-	assert.Equal(t, fmt.Sprint(p), "None")
+	assert.Equal(t, fmt.Sprint(catlib.None[string]()), "None")
+	assert.Equal(t, fmt.Sprint(catlib.None[int]()), "None")
 }
 
 func TestSomeUnwrap(t *testing.T) {
