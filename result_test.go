@@ -68,3 +68,13 @@ func TestErrValue(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, err.Error(), "foo")
 }
+
+func TestIsOk(t *testing.T) {
+	assert.True(t, catlib.Ok(42).IsOk())
+	assert.False(t, catlib.Err[int](errors.New("foo")).IsOk())
+}
+
+func TestIsErr(t *testing.T) {
+	assert.False(t, catlib.Ok(42).IsErr())
+	assert.True(t, catlib.Err[int](errors.New("foo")).IsErr())
+}

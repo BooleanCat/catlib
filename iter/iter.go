@@ -34,7 +34,7 @@ func Take[T any](iter Iterator[T], cap int) *TakeIter[T] {
 
 func (iter *TakeIter[T]) Next() catlib.Option[T] {
 	next := iter.iter.Next()
-	if !next.Present {
+	if next.IsNone() {
 		return next
 	}
 
@@ -68,7 +68,7 @@ func (iter *DropIter[T]) Next() catlib.Option[T] {
 
 	for i := 0; i < iter.cap; i++ {
 		next := iter.iter.Next()
-		if !next.Present {
+		if next.IsNone() {
 			return next
 		}
 	}

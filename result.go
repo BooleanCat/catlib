@@ -61,3 +61,11 @@ func (t Result[T]) UnwrapOrZero() T {
 func (t Result[T]) Value() (T, error) {
 	return t.t, t.err
 }
+
+func (t Result[T]) IsOk() bool {
+	return t.err == nil
+}
+
+func (t Result[T]) IsErr() bool {
+	return t.err != nil
+}

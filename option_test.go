@@ -66,3 +66,13 @@ func TestNoneValue(t *testing.T) {
 	_, present := catlib.None[int]().Value()
 	assert.False(t, present)
 }
+
+func TestIsSome(t *testing.T) {
+	assert.True(t, catlib.Some(42).IsSome())
+	assert.False(t, catlib.None[int]().IsSome())
+}
+
+func TestIsNone(t *testing.T) {
+	assert.False(t, catlib.Some(42).IsNone())
+	assert.True(t, catlib.None[int]().IsNone())
+}

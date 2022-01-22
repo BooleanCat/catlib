@@ -4,19 +4,19 @@ import "fmt"
 
 type Option[T any] struct {
 	t       T
-	Present bool
+	present bool
 }
 
 func Some[T any](t T) Option[T] {
-	return Option[T]{t: t, Present: true}
+	return Option[T]{t, true}
 }
 
 func None[T any]() Option[T] {
-	return Option[T]{Present: false}
+	return Option[T]{present: false}
 }
 
 func (t Option[T]) String() string {
-	if !t.Present {
+	if !t.present {
 		return "None"
 	}
 
@@ -26,7 +26,7 @@ func (t Option[T]) String() string {
 var _ fmt.Stringer = Option[struct{}]{}
 
 func (t Option[T]) Unwrap() T {
-	if t.Present {
+	if t.present {
 		return t.t
 	}
 
@@ -34,7 +34,7 @@ func (t Option[T]) Unwrap() T {
 }
 
 func (t Option[T]) UnwrapOr(s T) T {
-	if t.Present {
+	if t.present {
 		return t.t
 	}
 
@@ -42,7 +42,7 @@ func (t Option[T]) UnwrapOr(s T) T {
 }
 
 func (t Option[T]) UnwrapOrElse(f func() T) T {
-	if t.Present {
+	if t.present {
 		return t.t
 	}
 
@@ -50,7 +50,7 @@ func (t Option[T]) UnwrapOrElse(f func() T) T {
 }
 
 func (t Option[T]) UnwrapOrZero() T {
-	if t.Present {
+	if t.present {
 		return t.t
 	}
 
@@ -59,5 +59,13 @@ func (t Option[T]) UnwrapOrZero() T {
 }
 
 func (t Option[T]) Value() (T, bool) {
-	return t.t, t.Present
+	return t.t, t.present
+}
+
+func (t Option[T]) IsSome() bool {
+	return t.present
+}
+
+func (t Option[T]) IsNone() bool {
+	return !t.present
 }
