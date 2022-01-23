@@ -69,3 +69,11 @@ func (t Result[T]) IsOk() bool {
 func (t Result[T]) IsErr() bool {
 	return t.err != nil
 }
+
+func (t Result[T]) Expect(message string) T {
+	if t.err == nil {
+		return t.t
+	}
+
+	panic(message)
+}

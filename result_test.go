@@ -78,3 +78,13 @@ func TestIsErr(t *testing.T) {
 	assert.False(t, catlib.Ok(42).IsErr())
 	assert.True(t, catlib.Err[int](errors.New("foo")).IsErr())
 }
+
+func TestExpectOk(t *testing.T) {
+	assert.Equal(t, catlib.Ok(42).Expect("oops"), 42)
+}
+
+func TestExpectErr(t *testing.T) {
+	defer func() { assert.Equal(t, fmt.Sprint(recover()), "oops") }()
+	catlib.Err[int](errors.New("foo")).Expect("oops")
+	t.Error("did not panic")
+}
