@@ -17,7 +17,7 @@ func (c *CountIter) Next() catlib.Option[int] {
 }
 
 func Count() *CountIter {
-	return &CountIter{}
+	return new(CountIter)
 }
 
 var _ Iterator[int] = new(CountIter)
@@ -31,3 +31,23 @@ func Fold[S, T any](iter Iterator[S], initial T, f func(S, T) T) T {
 		}
 	}
 }
+
+type SliceIter[T any] struct {
+	slice []T
+	index int
+}
+
+func Lift[T any](slice []T) *SliceIter[T] {
+	return &SliceIter[T]{slice: slice}
+}
+
+func (iter *SliceIter[T]) Next() catlib.Option[T] {
+	if iter.index == len(iter.slice) {
+		return catlib.None[T]()
+	}
+
+	iter.index += 1
+	return catlib.Some(iter.slice[iter.index-1])
+}
+
+var _ Iterator[struct{}] = &SliceIter[struct{}]{}

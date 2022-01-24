@@ -19,3 +19,14 @@ func TestFold(t *testing.T) {
 	sum := iter.Fold[int](iter.Take[int](iter.Count(), 11), 0, add)
 	assert.Equal(t, sum, 55)
 }
+
+func TestLift(t *testing.T) {
+	slicesIter := iter.Lift([]string{"foo", "bar"})
+	assert.Equal(t, slicesIter.Next().Unwrap(), "foo")
+	assert.Equal(t, slicesIter.Next().Unwrap(), "bar")
+	assert.True(t, slicesIter.Next().IsNone())
+}
+
+func TestLiftEmpty(t *testing.T) {
+	assert.True(t, iter.Lift([]string{}).Next().IsNone())
+}
