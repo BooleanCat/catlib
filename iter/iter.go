@@ -111,3 +111,13 @@ func LinesString(r io.Reader) *MapIter[Result[[]byte], Result[string]] {
 
 	return Map[Result[[]byte]](iter, transform)
 }
+
+func Alphabet() *TakeIter[string] {
+	return Take[string](
+		Map[int](
+			Count(),
+			func(i int) string { return string(rune(i + 97)) },
+		),
+		26,
+	)
+}

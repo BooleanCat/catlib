@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/BooleanCat/catlib/internal/assert"
@@ -155,4 +156,9 @@ func TestLinesStringFailureLater(t *testing.T) {
 
 	assert.Equal(t, lines[0].Unwrap(), "hello")
 	assert.True(t, lines[1].IsErr())
+}
+
+func TestAlphabet(t *testing.T) {
+	alphabet := strings.Join(iter.Collect[string](iter.Alphabet()), "")
+	assert.Equal(t, alphabet, "abcdefghijklmnopqrstuvwxyz")
 }
