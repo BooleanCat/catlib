@@ -1,4 +1,4 @@
-package catlib
+package types
 
 import "fmt"
 

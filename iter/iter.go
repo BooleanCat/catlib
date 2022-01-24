@@ -5,21 +5,21 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/BooleanCat/catlib"
+	"github.com/BooleanCat/catlib/types"
 )
 
 type Iterator[T any] interface {
-	Next() catlib.Option[T]
+	Next() types.Option[T]
 }
 
 type CountIter struct {
 	count int
 }
 
-func (c *CountIter) Next() catlib.Option[int] {
+func (c *CountIter) Next() types.Option[int] {
 	next := c.count
 	c.count += 1
-	return catlib.Some(next)
+	return types.Some(next)
 }
 
 func Count() *CountIter {
@@ -47,13 +47,13 @@ func Lift[T any](slice []T) *SliceIter[T] {
 	return &SliceIter[T]{slice: slice}
 }
 
-func (iter *SliceIter[T]) Next() catlib.Option[T] {
+func (iter *SliceIter[T]) Next() types.Option[T] {
 	if iter.index == len(iter.slice) {
-		return catlib.None[T]()
+		return types.None[T]()
 	}
 
 	iter.index += 1
-	return catlib.Some(iter.slice[iter.index-1])
+	return types.Some(iter.slice[iter.index-1])
 }
 
 var _ Iterator[struct{}] = &SliceIter[struct{}]{}
@@ -79,35 +79,35 @@ func Lines(r io.Reader) *LineIter {
 	return &LineIter{bufio.NewReader(r), false}
 }
 
-func (iter *LineIter) Next() catlib.Option[catlib.Result[[]byte]] {
+func (iter *LineIter) Next() types.Option[types.Result[[]byte]] {
 	if iter.finished {
-		return catlib.None[catlib.Result[[]byte]]()
+		return types.None[types.Result[[]byte]]()
 	}
 
 	content, err := iter.r.ReadBytes('\n')
 
 	if err == io.EOF {
 		iter.finished = true
-		return catlib.Some(catlib.Ok(content))
+		return types.Some(types.Ok(content))
 	}
 
 	if err != nil {
 		iter.finished = true
-		return catlib.Some(catlib.Err[[]byte](fmt.Errorf(`read line: %w`, err)))
+		return types.Some(types.Err[[]byte](fmt.Errorf(`read line: %w`, err)))
 	}
 
-	return catlib.Some(catlib.Ok(content[:len(content)-1]))
+	return types.Some(types.Ok(content[:len(content)-1]))
 }
 
-func LinesString(r io.Reader) *MapIter[catlib.Result[[]byte], catlib.Result[string]] {
+func LinesString(r io.Reader) *MapIter[types.Result[[]byte], types.Result[string]] {
 	iter := Lines(r)
-	transform := func(line catlib.Result[[]byte]) catlib.Result[string] {
+	transform := func(line types.Result[[]byte]) types.Result[string] {
 		if v, err := line.Value(); err != nil {
-			return catlib.Err[string](err)
+			return types.Err[string](err)
 		} else {
-			return catlib.Ok(string(v))
+			return types.Ok(string(v))
 		}
 	}
 
-	return Map[catlib.Result[[]byte]](iter, transform)
+	return Map[types.Result[[]byte]](iter, transform)
 }

@@ -8,9 +8,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/BooleanCat/catlib"
 	"github.com/BooleanCat/catlib/internal/assert"
 	"github.com/BooleanCat/catlib/iter"
+	"github.com/BooleanCat/catlib/types"
 )
 
 func TestCount(t *testing.T) {
@@ -52,7 +52,7 @@ func TestLines(t *testing.T) {
 	assert.Nil(t, err)
 	defer file.Close()
 
-	lines := iter.Collect[catlib.Result[[]byte]](iter.Lines(file))
+	lines := iter.Collect[types.Result[[]byte]](iter.Lines(file))
 
 	assert.Equal(t, len(lines), 5)
 	assert.DeepEqual(t, lines[0].Unwrap(), []byte("This is"))
@@ -63,7 +63,7 @@ func TestLines(t *testing.T) {
 }
 
 func TestLinesEmpty(t *testing.T) {
-	lines := iter.Collect[catlib.Result[[]byte]](iter.Lines(new(bytes.Buffer)))
+	lines := iter.Collect[types.Result[[]byte]](iter.Lines(new(bytes.Buffer)))
 
 	assert.Equal(t, len(lines), 1)
 	assert.DeepEqual(t, lines[0].Unwrap(), []byte(""))
@@ -97,7 +97,7 @@ var _ io.Reader = new(fakeReader)
 
 func TestLinesFailure(t *testing.T) {
 	reader := newFakeReader(readResult{make([]byte, 0), errors.New("oops")})
-	lines := iter.Collect[catlib.Result[[]byte]](iter.Lines(reader))
+	lines := iter.Collect[types.Result[[]byte]](iter.Lines(reader))
 
 	_, err := lines[0].Value()
 	assert.NotNil(t, err)
@@ -109,7 +109,7 @@ func TestLinesFailureLater(t *testing.T) {
 		readResult{[]byte("hello\n"), nil},
 		readResult{make([]byte, 0), errors.New("oops")},
 	)
-	lines := iter.Collect[catlib.Result[[]byte]](iter.Lines(reader))
+	lines := iter.Collect[types.Result[[]byte]](iter.Lines(reader))
 
 	assert.DeepEqual(t, lines[0].Unwrap(), []byte("hello"))
 	assert.True(t, lines[1].IsErr())
@@ -120,7 +120,7 @@ func TestLinesString(t *testing.T) {
 	assert.Nil(t, err)
 	defer file.Close()
 
-	lines := iter.Collect[catlib.Result[string]](iter.LinesString(file))
+	lines := iter.Collect[types.Result[string]](iter.LinesString(file))
 
 	assert.Equal(t, len(lines), 5)
 	assert.Equal(t, lines[0].Unwrap(), "This is")
@@ -131,7 +131,7 @@ func TestLinesString(t *testing.T) {
 }
 
 func TestLinesStringEmpty(t *testing.T) {
-	lines := iter.Collect[catlib.Result[string]](iter.LinesString(new(bytes.Buffer)))
+	lines := iter.Collect[types.Result[string]](iter.LinesString(new(bytes.Buffer)))
 
 	assert.Equal(t, len(lines), 1)
 	assert.Equal(t, lines[0].Unwrap(), "")
@@ -139,7 +139,7 @@ func TestLinesStringEmpty(t *testing.T) {
 
 func TestLinesStringFailure(t *testing.T) {
 	reader := newFakeReader(readResult{make([]byte, 0), errors.New("oops")})
-	lines := iter.Collect[catlib.Result[string]](iter.LinesString(reader))
+	lines := iter.Collect[types.Result[string]](iter.LinesString(reader))
 
 	_, err := lines[0].Value()
 	assert.NotNil(t, err)
@@ -151,7 +151,7 @@ func TestLinesStringFailureLater(t *testing.T) {
 		readResult{[]byte("hello\n"), nil},
 		readResult{make([]byte, 0), errors.New("oops")},
 	)
-	lines := iter.Collect[catlib.Result[string]](iter.LinesString(reader))
+	lines := iter.Collect[types.Result[string]](iter.LinesString(reader))
 
 	assert.Equal(t, lines[0].Unwrap(), "hello")
 	assert.True(t, lines[1].IsErr())

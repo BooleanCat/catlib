@@ -1,6 +1,6 @@
 package iter
 
-import "github.com/BooleanCat/catlib"
+import "github.com/BooleanCat/catlib/types"
 
 type FilterIter[T any] struct {
 	iter Iterator[T]
@@ -11,7 +11,7 @@ func Filter[T any](iter Iterator[T], f func(T) bool) *FilterIter[T] {
 	return &FilterIter[T]{iter, f}
 }
 
-func (iter *FilterIter[T]) Next() catlib.Option[T] {
+func (iter *FilterIter[T]) Next() types.Option[T] {
 	for {
 		next := iter.iter.Next()
 		if next.IsNone() {
