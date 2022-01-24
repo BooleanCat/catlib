@@ -1,6 +1,13 @@
 package iter
 
-import "github.com/BooleanCat/catlib"
+import (
+	"bufio"
+	"bytes"
+	"fmt"
+	"io"
+
+	"github.com/BooleanCat/catlib"
+)
 
 type Iterator[T any] interface {
 	Next() catlib.Option[T]
@@ -62,4 +69,45 @@ func Collect[T any](iter Iterator[T]) []T {
 			return items
 		}
 	}
+}
+
+type LineIter struct {
+	r        *bufio.Reader
+	finished bool
+}
+
+func Lines(r io.Reader) *LineIter {
+	return &LineIter{bufio.NewReader(r), false}
+}
+
+func (iter *LineIter) Next() catlib.Option[catlib.Result[[]byte]] {
+	if iter.finished {
+		return catlib.None[catlib.Result[[]byte]]()
+	}
+
+	buffer := bytes.NewBuffer(make([]byte, 0))
+
+	for {
+		line, isPrefix, err := iter.r.ReadLine()
+		if err != nil && err != io.EOF {
+			iter.finished = true
+			return catlib.Some(catlib.Err[[]byte](fmt.Errorf("read line: %w", err)))
+		}
+
+		// Cannot fail, as per bytes docs
+		buffer.Write(line)
+
+		if isPrefix {
+			continue
+		}
+
+		if err == io.EOF {
+			iter.finished = true
+			return catlib.Some(catlib.Ok(buffer.Bytes()))
+		}
+
+		break
+	}
+
+	return catlib.Some(catlib.Ok(buffer.Bytes()))
 }

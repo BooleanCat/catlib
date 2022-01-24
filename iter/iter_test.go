@@ -1,8 +1,11 @@
 package iter_test
 
 import (
+	"bytes"
+	"os"
 	"testing"
 
+	"github.com/BooleanCat/catlib"
 	"github.com/BooleanCat/catlib/internal/assert"
 	"github.com/BooleanCat/catlib/iter"
 )
@@ -39,4 +42,26 @@ func TestCollect(t *testing.T) {
 func TestEmpty(t *testing.T) {
 	numbers := iter.Collect[int](iter.Take[int](iter.Count(), 0))
 	assert.DeepEqual(t, numbers, []int{})
+}
+
+func TestLines(t *testing.T) {
+	file, err := os.Open("fixtures/lines.txt")
+	assert.Nil(t, err)
+	defer file.Close()
+
+	lines := iter.Collect[catlib.Result[[]byte]](iter.Lines(file))
+
+	assert.Equal(t, len(lines), 5)
+	assert.DeepEqual(t, lines[0].Unwrap(), []byte("This is"))
+	assert.DeepEqual(t, lines[1].Unwrap(), []byte("a file"))
+	assert.DeepEqual(t, lines[2].Unwrap(), []byte("with"))
+	assert.DeepEqual(t, lines[3].Unwrap(), []byte("a trailing newline"))
+	assert.DeepEqual(t, lines[4].Unwrap(), []byte(""))
+}
+
+func TestLinesEmpty(t *testing.T) {
+	lines := iter.Collect[catlib.Result[[]byte]](iter.Lines(new(bytes.Buffer)))
+
+	assert.Equal(t, len(lines), 1)
+	assert.DeepEqual(t, lines[0].Unwrap(), []byte(""))
 }

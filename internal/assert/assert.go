@@ -6,7 +6,7 @@ import (
 )
 
 type Ordered interface {
-	~string | ~int
+	~string | ~int | byte
 }
 
 func Equal[S Ordered](t *testing.T, a, b S) {
