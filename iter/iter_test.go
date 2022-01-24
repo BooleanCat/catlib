@@ -30,3 +30,13 @@ func TestLift(t *testing.T) {
 func TestLiftEmpty(t *testing.T) {
 	assert.True(t, iter.Lift([]string{}).Next().IsNone())
 }
+
+func TestCollect(t *testing.T) {
+	numbers := iter.Collect[int](iter.Take[int](iter.Count(), 3))
+	assert.DeepEqual(t, numbers, []int{0, 1, 2})
+}
+
+func TestEmpty(t *testing.T) {
+	numbers := iter.Collect[int](iter.Take[int](iter.Count(), 0))
+	assert.DeepEqual(t, numbers, []int{})
+}

@@ -1,6 +1,9 @@
 package assert
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 type Ordered interface {
 	~string | ~int
@@ -33,5 +36,11 @@ func Nil(t *testing.T, v interface{}) {
 func NotNil(t *testing.T, v interface{}) {
 	if v == nil {
 		t.Errorf(`expected "%v" not to be nil`, v)
+	}
+}
+
+func DeepEqual(t *testing.T, v, w interface{}) {
+	if !reflect.DeepEqual(v, w) {
+		t.Errorf(`expected "%v" to equal "%v"`, v, w)
 	}
 }

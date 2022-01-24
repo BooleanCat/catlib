@@ -51,3 +51,15 @@ func (iter *SliceIter[T]) Next() catlib.Option[T] {
 }
 
 var _ Iterator[struct{}] = &SliceIter[struct{}]{}
+
+func Collect[T any](iter Iterator[T]) []T {
+	items := make([]T, 0)
+
+	for {
+		if v, ok := iter.Next().Value(); ok {
+			items = append(items, v)
+		} else {
+			return items
+		}
+	}
+}
