@@ -114,3 +114,45 @@ func TestLinesFailureLater(t *testing.T) {
 	assert.DeepEqual(t, lines[0].Unwrap(), []byte("hello"))
 	assert.True(t, lines[1].IsErr())
 }
+
+func TestLinesString(t *testing.T) {
+	file, err := os.Open("fixtures/lines.txt")
+	assert.Nil(t, err)
+	defer file.Close()
+
+	lines := iter.Collect[catlib.Result[string]](iter.LinesString(file))
+
+	assert.Equal(t, len(lines), 5)
+	assert.Equal(t, lines[0].Unwrap(), "This is")
+	assert.Equal(t, lines[1].Unwrap(), "a file")
+	assert.Equal(t, lines[2].Unwrap(), "with")
+	assert.Equal(t, lines[3].Unwrap(), "a trailing newline")
+	assert.Equal(t, lines[4].Unwrap(), "")
+}
+
+func TestLinesStringEmpty(t *testing.T) {
+	lines := iter.Collect[catlib.Result[string]](iter.LinesString(new(bytes.Buffer)))
+
+	assert.Equal(t, len(lines), 1)
+	assert.Equal(t, lines[0].Unwrap(), "")
+}
+
+func TestLinesStringFailure(t *testing.T) {
+	reader := newFakeReader(readResult{make([]byte, 0), errors.New("oops")})
+	lines := iter.Collect[catlib.Result[string]](iter.LinesString(reader))
+
+	_, err := lines[0].Value()
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "read line: oops")
+}
+
+func TestLinesStringFailureLater(t *testing.T) {
+	reader := newFakeReader(
+		readResult{[]byte("hello\n"), nil},
+		readResult{make([]byte, 0), errors.New("oops")},
+	)
+	lines := iter.Collect[catlib.Result[string]](iter.LinesString(reader))
+
+	assert.Equal(t, lines[0].Unwrap(), "hello")
+	assert.True(t, lines[1].IsErr())
+}

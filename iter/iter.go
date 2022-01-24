@@ -98,3 +98,16 @@ func (iter *LineIter) Next() catlib.Option[catlib.Result[[]byte]] {
 
 	return catlib.Some(catlib.Ok(content[:len(content)-1]))
 }
+
+func LinesString(r io.Reader) *MapIter[catlib.Result[[]byte], catlib.Result[string]] {
+	iter := Lines(r)
+	transform := func(line catlib.Result[[]byte]) catlib.Result[string] {
+		if v, err := line.Value(); err != nil {
+			return catlib.Err[string](err)
+		} else {
+			return catlib.Ok(string(v))
+		}
+	}
+
+	return Map[catlib.Result[[]byte]](iter, transform)
+}
