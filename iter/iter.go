@@ -2,7 +2,6 @@ package iter
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"io"
 
@@ -85,29 +84,17 @@ func (iter *LineIter) Next() catlib.Option[catlib.Result[[]byte]] {
 		return catlib.None[catlib.Result[[]byte]]()
 	}
 
-	buffer := bytes.NewBuffer(make([]byte, 0))
+	content, err := iter.r.ReadBytes('\n')
 
-	for {
-		line, isPrefix, err := iter.r.ReadLine()
-		if err != nil && err != io.EOF {
-			iter.finished = true
-			return catlib.Some(catlib.Err[[]byte](fmt.Errorf("read line: %w", err)))
-		}
-
-		// Cannot fail, as per bytes docs
-		buffer.Write(line)
-
-		if isPrefix {
-			continue
-		}
-
-		if err == io.EOF {
-			iter.finished = true
-			return catlib.Some(catlib.Ok(buffer.Bytes()))
-		}
-
-		break
+	if err == io.EOF {
+		iter.finished = true
+		return catlib.Some(catlib.Ok(content))
 	}
 
-	return catlib.Some(catlib.Ok(buffer.Bytes()))
+	if err != nil {
+		iter.finished = true
+		return catlib.Some(catlib.Err[[]byte](fmt.Errorf(`read line: %w`, err)))
+	}
+
+	return catlib.Some(catlib.Ok(content[:len(content)-1]))
 }

@@ -2,6 +2,9 @@ package iter_test
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
+	"io"
 	"os"
 	"testing"
 
@@ -64,4 +67,50 @@ func TestLinesEmpty(t *testing.T) {
 
 	assert.Equal(t, len(lines), 1)
 	assert.DeepEqual(t, lines[0].Unwrap(), []byte(""))
+}
+
+type readResult struct {
+	content []byte
+	err     error
+}
+
+type fakeReader struct {
+	results []readResult
+	index   int
+}
+
+func newFakeReader(results ...readResult) *fakeReader {
+	return &fakeReader{results, 0}
+}
+
+func (r *fakeReader) Read(b []byte) (int, error) {
+	r.index += 1
+	if r.results[r.index-1].err != nil {
+		return 0, r.results[r.index-1].err
+	}
+	n := copy(b, r.results[r.index-1].content)
+	fmt.Println(n)
+	return n, nil
+}
+
+var _ io.Reader = new(fakeReader)
+
+func TestLinesFailure(t *testing.T) {
+	reader := newFakeReader(readResult{make([]byte, 0), errors.New("oops")})
+	lines := iter.Collect[catlib.Result[[]byte]](iter.Lines(reader))
+
+	_, err := lines[0].Value()
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "read line: oops")
+}
+
+func TestLinesFailureLater(t *testing.T) {
+	reader := newFakeReader(
+		readResult{[]byte("hello\n"), nil},
+		readResult{make([]byte, 0), errors.New("oops")},
+	)
+	lines := iter.Collect[catlib.Result[[]byte]](iter.Lines(reader))
+
+	assert.DeepEqual(t, lines[0].Unwrap(), []byte("hello"))
+	assert.True(t, lines[1].IsErr())
 }
