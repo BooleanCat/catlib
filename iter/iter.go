@@ -5,21 +5,21 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/BooleanCat/catlib/types"
+	. "github.com/BooleanCat/catlib/types"
 )
 
 type Iterator[T any] interface {
-	Next() types.Option[T]
+	Next() Option[T]
 }
 
 type CountIter struct {
 	count int
 }
 
-func (c *CountIter) Next() types.Option[int] {
+func (c *CountIter) Next() Option[int] {
 	next := c.count
 	c.count += 1
-	return types.Some(next)
+	return Some(next)
 }
 
 func Count() *CountIter {
@@ -47,13 +47,13 @@ func Lift[T any](slice []T) *SliceIter[T] {
 	return &SliceIter[T]{slice: slice}
 }
 
-func (iter *SliceIter[T]) Next() types.Option[T] {
+func (iter *SliceIter[T]) Next() Option[T] {
 	if iter.index == len(iter.slice) {
-		return types.None[T]()
+		return None[T]()
 	}
 
 	iter.index += 1
-	return types.Some(iter.slice[iter.index-1])
+	return Some(iter.slice[iter.index-1])
 }
 
 var _ Iterator[struct{}] = &SliceIter[struct{}]{}
@@ -79,35 +79,35 @@ func Lines(r io.Reader) *LineIter {
 	return &LineIter{bufio.NewReader(r), false}
 }
 
-func (iter *LineIter) Next() types.Option[types.Result[[]byte]] {
+func (iter *LineIter) Next() Option[Result[[]byte]] {
 	if iter.finished {
-		return types.None[types.Result[[]byte]]()
+		return None[Result[[]byte]]()
 	}
 
 	content, err := iter.r.ReadBytes('\n')
 
 	if err == io.EOF {
 		iter.finished = true
-		return types.Some(types.Ok(content))
+		return Some(Ok(content))
 	}
 
 	if err != nil {
 		iter.finished = true
-		return types.Some(types.Err[[]byte](fmt.Errorf(`read line: %w`, err)))
+		return Some(Err[[]byte](fmt.Errorf(`read line: %w`, err)))
 	}
 
-	return types.Some(types.Ok(content[:len(content)-1]))
+	return Some(Ok(content[:len(content)-1]))
 }
 
-func LinesString(r io.Reader) *MapIter[types.Result[[]byte], types.Result[string]] {
+func LinesString(r io.Reader) *MapIter[Result[[]byte], Result[string]] {
 	iter := Lines(r)
-	transform := func(line types.Result[[]byte]) types.Result[string] {
+	transform := func(line Result[[]byte]) Result[string] {
 		if v, err := line.Value(); err != nil {
-			return types.Err[string](err)
+			return Err[string](err)
 		} else {
-			return types.Ok(string(v))
+			return Ok(string(v))
 		}
 	}
 
-	return Map[types.Result[[]byte]](iter, transform)
+	return Map[Result[[]byte]](iter, transform)
 }

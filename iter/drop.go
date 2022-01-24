@@ -1,6 +1,6 @@
 package iter
 
-import "github.com/BooleanCat/catlib/types"
+import . "github.com/BooleanCat/catlib/types"
 
 type DropIter[T any] struct {
 	iter    Iterator[T]
@@ -12,7 +12,7 @@ func Drop[T any](iter Iterator[T], cap int) *DropIter[T] {
 	return &DropIter[T]{iter, cap, false}
 }
 
-func (iter *DropIter[T]) Next() types.Option[T] {
+func (iter *DropIter[T]) Next() Option[T] {
 	if iter.dropped {
 		return iter.iter.Next()
 	}

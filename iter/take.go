@@ -1,6 +1,8 @@
 package iter
 
-import "github.com/BooleanCat/catlib/types"
+import (
+	. "github.com/BooleanCat/catlib/types"
+)
 
 type TakeIter[T any] struct {
 	iter  Iterator[T]
@@ -12,7 +14,7 @@ func Take[T any](iter Iterator[T], cap int) *TakeIter[T] {
 	return &TakeIter[T]{iter, cap, 0}
 }
 
-func (iter *TakeIter[T]) Next() types.Option[T] {
+func (iter *TakeIter[T]) Next() Option[T] {
 	next := iter.iter.Next()
 	if next.IsNone() {
 		return next
@@ -24,7 +26,7 @@ func (iter *TakeIter[T]) Next() types.Option[T] {
 		return next
 	}
 
-	return types.None[T]()
+	return None[T]()
 }
 
 var _ Iterator[struct{}] = new(TakeIter[struct{}])

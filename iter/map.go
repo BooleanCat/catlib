@@ -1,6 +1,6 @@
 package iter
 
-import "github.com/BooleanCat/catlib/types"
+import . "github.com/BooleanCat/catlib/types"
 
 type MapIter[T, S any] struct {
 	iter Iterator[T]
@@ -11,11 +11,11 @@ func Map[T, S any](iter Iterator[T], f func(T) S) *MapIter[T, S] {
 	return &MapIter[T, S]{iter, f}
 }
 
-func (iter *MapIter[T, S]) Next() types.Option[S] {
+func (iter *MapIter[T, S]) Next() Option[S] {
 	if v, ok := iter.iter.Next().Value(); !ok {
-		return types.None[S]()
+		return None[S]()
 	} else {
-		return types.Some(iter.f(v))
+		return Some(iter.f(v))
 	}
 }
 
